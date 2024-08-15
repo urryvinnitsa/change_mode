@@ -19,7 +19,6 @@
 #include "mavlink.h"
 #include "contiki.h"
 #include "hard_config.h"
-#include "init.h"
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_adc.h"
 #include "stm32f4xx_iwdg.h"
@@ -35,9 +34,6 @@ extern process_event_t event_kill;
 
 //#define DEBUG_MY 1
 
-#define POWER_PIN GPIO_Pin_9
-#define POWER_PORT GPIOA
-#define POWER(x) x ? GPIO_SetBits(POWER_PORT,POWER_PIN) : GPIO_ResetBits(POWER_PORT,POWER_PIN);
 
 #endif // MAIN_H
 

@@ -31,16 +31,11 @@ uint32_t cl;
 process_event_t event_button;
 process_event_t event_1ms;
 process_event_t event_kill;
-static char pair = 0;
-mavlink_message_t message1;
-#define CODE_LOITER 5
-#define CODE_AUTO 3
-static uint8_t buffer_sbus[32];
+void IWDG_Configuration(void);
 //--------------------------------------------------
 PROCESS(led_process, "Led");
 PROCESS_THREAD(led_process, ev, data)
 {
-    static int rez = 0;
     static int cnt = 0;
     PROCESS_BEGIN();
     GPIO_InitTypeDef GPIO_InitStruct;
@@ -83,12 +78,10 @@ PROCESS_THREAD(led_process, ev, data)
 //--------------------------------------------------
 int main(void)
 {
-    static int rez = 0;
+    static int rez = 0x00010001;
     RCC_HSEConfig(RCC_HSE_ON);
     SystemInit();
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC, ENABLE);
-    USART6_Init(115200);
-    printf("\r\nstart version  %.1f\r\n", 1.0);
     clock_init();
     rtimer_init();
     process_init();
@@ -100,7 +93,6 @@ int main(void)
     process_start(&led_process, NULL);
     process_start(&button_process, NULL);
     process_start(&exe_process, NULL);
-    process_post(&exe_process, event_button, &rez);
     IWDG_Configuration();
     for (;;)
     {
@@ -110,25 +102,22 @@ int main(void)
     }
 }
 //--------------------------------------------------
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#pragma import(__use_no_semihosting)
-struct __FILE
+void IWDG_Configuration(void)
 {
-    int handle;
-};
-FILE __stdout;
-void _sys_exit(int x)
-{
-    x = x;
-}
-PUTCHAR_PROTOTYPE
-{
-    USART_SendData(USART6, (uint8_t) ch);
-    while (USART_GetFlagStatus(USART6, USART_FLAG_TC) == RESET)
-    {}
-    return ch;
+    /* IWDG timeout equal to 280 ms (the timeout may varies due to LSI frequency
+    dispersion) */
+    /* Enable write access to IWDG_PR and IWDG_RLR registers */
+    //  IWDG_WriteAccessCmd(
+    IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+    /* IWDG counter clock: 40KHz(LSI) / 256 = 156 Hz */
+    IWDG_SetPrescaler(IWDG_Prescaler_256);
+    /* Set counter reload value to 349 */
+    IWDG_SetReload(156 * 5); // 5 sec
+    /* Reload IWDG counter */
+    IWDG_ReloadCounter();       //4,42 sec
+    /* Enable IWDG (the LSI oscillator will be enabled by hardware) */
+    IWDG_Enable();
 }
 //--------------------------------------------------
-
 
 

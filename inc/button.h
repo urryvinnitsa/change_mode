@@ -14,7 +14,7 @@ typedef struct
 
 extern struct process button_process;
 extern volatile uint16_t rez_butt;
-extern volatile uint8_t a_h;
+
 
 
 

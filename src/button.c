@@ -26,7 +26,7 @@ void fnButtonInit(void);
 static void fnButtRead(void);
 static void fnSetRegButt(void);
 volatile uint16_t rez_butt;
-volatile uint16_t rez_butt_old;
+static uint16_t rez_butt_old = 0xFFFF;
 
 static union
 {

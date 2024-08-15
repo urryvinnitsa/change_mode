@@ -2,6 +2,7 @@
 // Файл                 : exe.c
 //**************************************************
 #include "main.h"
+#include "stm32f4xx.h"
 #if 0
 
 FLTMODE6 :
@@ -41,7 +42,7 @@ mavlink_message_t message;
 
 uint8_t buffer_sbus[256];
 void fnSendBinUart1(const uint8_t *s, int16_t len);
-int len;
+void USART1_Init(uint32_t bt);
 
 static union
 {
@@ -78,7 +79,8 @@ PROCESS_THREAD(exe_process, ev, data)
                     mavlink_msg_set_mode_pack(0xff, 158, &message, 1, 209, 12);
                 }
                 message.magic = 0xFD;//
-                len = mavlink_msg_to_send_buffer((uint8_t *)buffer_sbus, &message);
+                int len = mavlink_msg_to_send_buffer((uint8_t *)buffer_sbus, &message);
+                while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {}
                 fnSendBinUart1((const uint8_t *)buffer_sbus, len);
             }
         }
@@ -95,7 +97,38 @@ void fnSendBinUart1(const uint8_t *s, int16_t len)
     }
 }
 //------------------------------------
-
-
+void USART1_Init(uint32_t bt)
+{
+    /**USART1 GPIO Configuration
+    PA9   ------> USART1_TX
+    PA10   ------> USART1_RX
+    */
+    USART_InitTypeDef USART_InitStructure = {0};
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    //
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    //
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStruct.GPIO_Speed = GPIO_High_Speed;
+    GPIO_Init(GPIOA, &GPIO_InitStruct);
+    USART_DeInit(USART1);
+    USART_InitStructure.USART_BaudRate = bt;
+    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+    USART_InitStructure.USART_StopBits = USART_StopBits_1;
+    USART_InitStructure.USART_Parity = USART_Parity_No;
+    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
+    USART_Init(USART1, &USART_InitStructure);
+    USART_ClearFlag(USART1, USART_FLAG_CTS);
+    USART_Cmd(USART1, ENABLE);
+    USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);// ENABLE);
+}
+//------------------------------------
 
 
