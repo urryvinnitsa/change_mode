@@ -78,7 +78,6 @@ PROCESS_THREAD(led_process, ev, data)
 //--------------------------------------------------
 int main(void)
 {
-    static int rez = 0x00010001;
     RCC_HSEConfig(RCC_HSE_ON);
     SystemInit();
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC, ENABLE);

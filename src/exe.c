@@ -72,11 +72,11 @@ PROCESS_THREAD(exe_process, ev, data)
             {
                 if (press == 1)
                 {
-                    mavlink_msg_set_mode_pack(0xff, 158, &message, 1, 209, 2);
+                    mavlink_msg_set_mode_pack(0xff, 158, &message, 1, 209, 0);
                 }
                 else
                 {
-                    mavlink_msg_set_mode_pack(0xff, 158, &message, 1, 209, 12);
+                    mavlink_msg_set_mode_pack(0xff, 158, &message, 1, 209, 10);
                 }
                 message.magic = 0xFD;//
                 int len = mavlink_msg_to_send_buffer((uint8_t *)buffer_sbus, &message);
