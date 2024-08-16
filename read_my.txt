@@ -1,2 +1,6 @@
 1 часть переключение режимов по кнопке
 2 часть выдача количество видимых спутников на 16 канал rc
+
+Используем  для формирования мавлинк пакета мавлинк библиотеку -  https://github.com/mavlink/c_library_v2/tree/master.  
+ Для того, чтобы библиотека мавлинк скомпилилась из кейла, необходимо докачать с сайта компилятор  https://developer.arm.com/downloads/-/gnu-rm  
+https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-win32.exe
