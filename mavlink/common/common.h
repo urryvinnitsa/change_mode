@@ -141,8 +141,8 @@ typedef enum MAV_SYS_STATUS_SENSOR
     MAV_SYS_STATUS_PREARM_CHECK = 268435456, /* 0x10000000 pre-arm check status. Always healthy when armed | */
     MAV_SYS_STATUS_OBSTACLE_AVOIDANCE = 536870912, /* 0x20000000 Avoidance/collision prevention | */
     MAV_SYS_STATUS_SENSOR_PROPULSION = 1073741824, /* 0x40000000 propulsion (actuator, esc, motor or propellor) | */
-    MAV_SYS_STATUS_EXTENSION_USED = (int)2147483648u, /* 0x80000000 Extended bit-field are used for further sensor status bits (needs to be set in onboard_control_sensors_present only) | */
-    MAV_SYS_STATUS_SENSOR_ENUM_END = (int)2147483649u, /*  | */
+    MAV_SYS_STATUS_EXTENSION_USED = 2147483648, /* 0x80000000 Extended bit-field are used for further sensor status bits (needs to be set in onboard_control_sensors_present only) | */
+    MAV_SYS_STATUS_SENSOR_ENUM_END = 2147483649, /*  | */
 } MAV_SYS_STATUS_SENSOR;
 #endif
 
@@ -2409,7 +2409,7 @@ typedef enum MAV_EVENT_CURRENT_SEQUENCE_FLAGS
 /** @brief Flags in the HIL_SENSOR message indicate which fields have updated since the last message */
 #ifndef HAVE_ENUM_HIL_SENSOR_UPDATED_FLAGS
 #define HAVE_ENUM_HIL_SENSOR_UPDATED_FLAGS
-typedef enum  HIL_SENSOR_UPDATED_FLAGS
+typedef enum HIL_SENSOR_UPDATED_FLAGS
 {
     HIL_SENSOR_UPDATED_NONE = 0, /* None of the fields in HIL_SENSOR have been updated | */
     HIL_SENSOR_UPDATED_XACC = 1, /* The value in the xacc field has been updated | */
@@ -2425,8 +2425,8 @@ typedef enum  HIL_SENSOR_UPDATED_FLAGS
     HIL_SENSOR_UPDATED_DIFF_PRESSURE = 1024, /* The value in the diff_pressure field has been updated | */
     HIL_SENSOR_UPDATED_PRESSURE_ALT = 2048, /* The value in the pressure_alt field has been updated | */
     HIL_SENSOR_UPDATED_TEMPERATURE = 4096, /* The value in the temperature field has been updated | */
-    HIL_SENSOR_UPDATED_RESET = (int)2147483648u, /* Full reset of attitude/position/velocities/etc was performed in sim (Bit 31). | */
-    HIL_SENSOR_UPDATED_FLAGS_ENUM_END = (int)2147483649u, /*  | */
+    HIL_SENSOR_UPDATED_RESET = 2147483648, /* Full reset of attitude/position/velocities/etc was performed in sim (Bit 31). | */
+    HIL_SENSOR_UPDATED_FLAGS_ENUM_END = 2147483649, /*  | */
 } HIL_SENSOR_UPDATED_FLAGS;
 #endif
 

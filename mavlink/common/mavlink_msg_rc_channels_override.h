@@ -1,6 +1,6 @@
 #pragma once
 // MESSAGE RC_CHANNELS_OVERRIDE PACKING
-#include <stdint.h>
+
 #define MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE 70
 
 

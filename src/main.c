@@ -30,8 +30,13 @@ uint32_t idle_count = 0;
 uint32_t cl;
 process_event_t event_button;
 process_event_t event_1ms;
-process_event_t event_kill;
+process_event_t event_decode;
 void IWDG_Configuration(void);
+// for debug ------------
+static char pair = 0;
+mavlink_message_t message1;
+static uint8_t buffer_sbus[20];
+//-----------------------
 //--------------------------------------------------
 PROCESS(led_process, "Led");
 PROCESS_THREAD(led_process, ev, data)
@@ -60,12 +65,12 @@ PROCESS_THREAD(led_process, ev, data)
             if (!pair)
             {
                 pair = 1;
-                mavlink_msg_set_mode_pack(0xff, 158, &message1, 1, 209, 12);
+                mavlink_msg_set_mode_pack(0xff, 158, &message1, 1, 209, 0);
             }
             else
             {
                 pair = 0;
-                mavlink_msg_set_mode_pack(0xff, 158, &message1, 1, 209, 2);
+                mavlink_msg_set_mode_pack(0xff, 158, &message1, 1, 209, 10);
             }
             message1.magic = 0xFD;//
             int    len = mavlink_msg_to_send_buffer((uint8_t *)buffer_sbus, &message1);
@@ -87,7 +92,7 @@ int main(void)
     //
     event_button = process_alloc_event();
     event_1ms = process_alloc_event();
-    event_kill = process_alloc_event();
+    event_decode = process_alloc_event();
     process_start(&etimer_process, NULL);
     process_start(&led_process, NULL);
     process_start(&button_process, NULL);

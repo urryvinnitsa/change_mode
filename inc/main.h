@@ -30,7 +30,7 @@
 
 extern process_event_t event_button;
 extern process_event_t event_1ms;
-extern process_event_t event_kill;
+extern process_event_t event_decode;
 
 //#define DEBUG_MY 1
 

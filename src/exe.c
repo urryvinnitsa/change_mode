@@ -37,13 +37,15 @@ Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >= 1750
 
 #endif
 mavlink_message_t message;
-#define CODE_LOITER 5
-#define CODE_AUTO 3
+mavlink_message_t message_read;
+mavlink_status_t status;
+mavlink_status_t status_read;
+mavlink_gps_raw_int_t gps_raw;
 
 uint8_t buffer_sbus[256];
 void fnSendBinUart1(const uint8_t *s, int16_t len);
 void USART1_Init(uint32_t bt);
-
+volatile uint8_t satellite = 0;
 static union
 {
     uint16_t arr[2];
@@ -56,7 +58,7 @@ PROCESS(exe_process, "T_exe");
 PROCESS_THREAD(exe_process, ev, data)
 {
     PROCESS_BEGIN();
-    USART1_Init(115200);
+    USART1_Init(57600);
     while (1)
     {
         PROCESS_WAIT_EVENT_UNTIL(ev == event_1ms || ev == event_button);
@@ -127,8 +129,37 @@ void USART1_Init(uint32_t bt)
     USART_Init(USART1, &USART_InitStructure);
     USART_ClearFlag(USART1, USART_FLAG_CTS);
     USART_Cmd(USART1, ENABLE);
-    USART_ITConfig(USART1, USART_IT_RXNE, DISABLE);// ENABLE);
+    USART_ITConfig(USART1, USART_IT_RXNE,  ENABLE);
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 }
 //------------------------------------
+void USART1_IRQHandler(void)
+{
+    static uint8_t m_Byte;
+    static int16_t old_data;
+    if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
+    {
+        m_Byte = USART_ReceiveData(USART1);
+        mavlink_parse_char(MAVLINK_COMM_1, m_Byte, &message_read, &status_read);
+        if (message_read.msgid == MAVLINK_MSG_ID_GPS_RAW_INT)
+        {
+            __disable_irq();
+            mavlink_msg_gps_raw_int_decode(&message_read, &gps_raw);
+            satellite = gps_raw.satellites_visible;
+            __enable_irq();
+        }//(message.msgid == MAVLINK_MSG_ID_GPS_RAW_INT)
+    }// end     if( USART_GetITStatus(USART2, USART_IT_RXNE) )
+    if (USART_GetFlagStatus(USART1, USART_FLAG_ORE) != RESET)
+    {
+        (void)USART_ReceiveData(USART1);
+    }
+}
+//---------------------------------------------------
 
 
