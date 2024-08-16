@@ -26,7 +26,7 @@
 #include "stm32f4xx_spi.h"
 #include "button.h"
 #include "exe.h"
-
+#include "satellite.h"
 
 extern process_event_t event_button;
 extern process_event_t event_1ms;

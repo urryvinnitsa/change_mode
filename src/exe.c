@@ -3,46 +3,16 @@
 //**************************************************
 #include "main.h"
 #include "stm32f4xx.h"
-#if 0
 
-FLTMODE6 :
-Flight Mode 6¶
-Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >= 1750
-
-0 Stabilize
-1 Acro
-2 AltHold
-3 Auto
-4 Guided
-5 Loiter
-6 RTL
-7 Circle
-9 Land
-11 Drift
-13 Sport
-14 Flip
-15 AutoTune
-16 PosHold
-17 Brake
-18 Throw
-19 Avoid_ADSB
-20 Guided_NoGPS
-21 Smart_RTL
-22 FlowHold
-23 Follow
-24 ZigZag
-25 SystemID
-26 Heli_Autorotate
-27 Auto RTL
-
-#endif
 mavlink_message_t message;
-mavlink_message_t message_read;
+volatile  mavlink_message_t message_read;
+volatile mavlink_status_t status_read;
 mavlink_status_t status;
-mavlink_status_t status_read;
+
 mavlink_gps_raw_int_t gps_raw;
 
 uint8_t buffer_sbus[256];
+
 void fnSendBinUart1(const uint8_t *s, int16_t len);
 void USART1_Init(uint32_t bt);
 volatile uint8_t satellite = 0;
@@ -52,7 +22,7 @@ static union
     uint32_t i;
 } un;
 
-
+static uint32_t  rez;
 //------------------------------------
 PROCESS(exe_process, "T_exe");
 PROCESS_THREAD(exe_process, ev, data)
@@ -142,18 +112,26 @@ void USART1_Init(uint32_t bt)
 void USART1_IRQHandler(void)
 {
     static uint8_t m_Byte;
-    static int16_t old_data;
     if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
     {
         m_Byte = USART_ReceiveData(USART1);
-        mavlink_parse_char(MAVLINK_COMM_1, m_Byte, &message_read, &status_read);
-        if (message_read.msgid == MAVLINK_MSG_ID_GPS_RAW_INT)
+        if (mavlink_parse_char(MAVLINK_COMM_1, m_Byte, &message_read, &status_read))
         {
-            __disable_irq();
-            mavlink_msg_gps_raw_int_decode(&message_read, &gps_raw);
-            satellite = gps_raw.satellites_visible;
-            __enable_irq();
-        }//(message.msgid == MAVLINK_MSG_ID_GPS_RAW_INT)
+            if (message_read.msgid == MAVLINK_MSG_ID_GPS_RAW_INT)
+            {
+                USART_ITConfig(USART1, USART_IT_RXNE,  DISABLE);
+                mavlink_msg_gps_raw_int_decode(&message_read, &gps_raw);
+                satellite = gps_raw.satellites_visible;
+                rez = 1000 + (satellite * 50);
+                if (rez > 2500)
+                {
+                    rez = 2500;
+                }
+                process_post(&satellite_process, event_decode, &rez);
+                USART_ClearFlag(USART1, USART_FLAG_CTS);
+                USART_ITConfig(USART1, USART_IT_RXNE,  ENABLE);
+            }//(message.msgid == MAVLINK_MSG_ID_GPS_RAW_INT)
+        }
     }// end     if( USART_GetITStatus(USART2, USART_IT_RXNE) )
     if (USART_GetFlagStatus(USART1, USART_FLAG_ORE) != RESET)
     {
@@ -161,5 +139,8 @@ void USART1_IRQHandler(void)
     }
 }
 //---------------------------------------------------
+
+
+
 
 

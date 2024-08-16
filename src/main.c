@@ -4,33 +4,13 @@
 //
 #include "main.h"
 
-#if 0
-0 manual
-1 circle
-2 stabilize
-3 trening
-4 acro
-5 fbwa
-6 fbwb
-7 cruise
-8 autotune
-9 trening
-10 rtl
-11 rtl
-12 loiter
-13 takeoff
-14 AVOID_A
-15 Guided
-16 trening
-17 xz
-18 xz
-19
-#endif
+
 uint32_t idle_count = 0;
-uint32_t cl;
+
 process_event_t event_button;
 process_event_t event_1ms;
 process_event_t event_decode;
+
 void IWDG_Configuration(void);
 // for debug ------------
 static char pair = 0;
@@ -97,6 +77,8 @@ int main(void)
     process_start(&led_process, NULL);
     process_start(&button_process, NULL);
     process_start(&exe_process, NULL);
+    process_start(&satellite_process, NULL);
+    //
     IWDG_Configuration();
     for (;;)
     {

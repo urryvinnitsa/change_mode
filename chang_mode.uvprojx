@@ -467,6 +467,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\exe.c</FilePath>
             </File>
+            <File>
+              <FileName>satellite.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\satellite.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1133,6 +1138,11 @@
               <FileName>exe.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\exe.h</FilePath>
+            </File>
+            <File>
+              <FileName>satellite.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\satellite.h</FilePath>
             </File>
           </Files>
         </Group>
