@@ -122,11 +122,14 @@ void USART1_IRQHandler(void)
                 USART_ITConfig(USART1, USART_IT_RXNE,  DISABLE);
                 mavlink_msg_gps_raw_int_decode(&message_read, &gps_raw);
                 satellite = gps_raw.satellites_visible;
-                rez = 1000 + (satellite * 50);
-                if (rez > 2500)
-                {
-                    rez = 2500;
-                }
+							  if(satellite <= 10)
+								{
+									rez = 2000;
+								}
+								else if(satellite >= 12)
+								{
+									rez = 1000;
+								}
                 process_post(&satellite_process, event_decode, &rez);
                 USART_ClearFlag(USART1, USART_FLAG_CTS);
                 USART_ITConfig(USART1, USART_IT_RXNE,  ENABLE);
