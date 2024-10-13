@@ -77,7 +77,7 @@ int main(void)
     process_start(&led_process, NULL);
     process_start(&button_process, NULL);
     process_start(&exe_process, NULL);
-    process_start(&satellite_process, NULL);
+    //process_start(&satellite_process, NULL);
     //
     IWDG_Configuration();
     for (;;)

@@ -12,7 +12,7 @@
 !*.c
 !*.h
 !*.s
-
+!*.hex
 # IAR project
 !*.ewd
 !*.ewp
